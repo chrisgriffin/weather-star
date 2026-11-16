@@ -1,0 +1,15 @@
+.header {
+  display: flex;
+  gap: var(--ws-inline-md);
+  align-items: center;
+  justify-content: space-between;
+  margin-block-end: var(--ws-stack-md);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--ws-font-family-heading);
+  font-size: var(--ws-font-size-lg);
+  font-weight: var(--ws-font-weight-semibold);
+  line-height: var(--ws-line-height-snug);
+}

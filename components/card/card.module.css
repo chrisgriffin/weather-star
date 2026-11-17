@@ -1,0 +1,14 @@
+.card {
+  padding: var(--ws-inset-lg);
+  border: var(--ws-border-default) solid var(--ws-color-border-default);
+  border-radius: var(--ws-radius-lg);
+  background: var(--ws-color-bg-surface-raised);
+  color: var(--ws-color-fg-default);
+  font-family: var(--ws-font-family-body);
+  font-size: var(--ws-font-size-md);
+  line-height: var(--ws-line-height-body);
+}
+
+.paddingNone {
+  padding: 0;
+}

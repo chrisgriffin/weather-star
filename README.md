@@ -1,2 +1,123 @@
 # weather-star
-A browser weather app in the style of 1990s local cable forecasts, built on a design system made with agentic-design-system.
+
+A browser weather app in the style of 1990s local cable forecasts. A one-off,
+built for fun on its own design system, which a design system template's
+`create` command made in one run. The app is a shell today: `npm run dev`
+serves one placeholder screen from `app/`, and the forecast screens are not
+built yet. It is published at
+[chrisgriffin.github.io/weather-star](https://chrisgriffin.github.io/weather-star/)
+on every push to `main`. What follows describes the design system the
+screens will be built from.
+
+A design system an agent can build in and keep honest: design tokens
+in the [DTCG](https://www.designtokens.org/tr/2025.10/format/) format, built
+into CSS custom properties by [Terrazzo](https://terrazzo.app); React
+components with CSS Modules, each with a contract, a story and a test;
+Storybook; and the [design-delta](https://github.com/chrisgriffin/design-delta)
+gate, which fails CI when code and contracts disagree, or when a component
+has no contract at all.
+
+> This repo is built in layers, each a merged build: the tokens, the
+> components with contracts, the Storybook, the agent layer, and the release
+> flow.
+
+## Tokens
+
+- `tokens/json/primitives/` holds literal values (a neutral ramp, one accent
+  ramp, a space scale, two font families, a type scale, radii, durations). A
+  component never uses a primitive.
+- `tokens/json/semantics/` aliases primitives by role (`color.bg.canvas`,
+  `inset.md`, `font-size.lg`). Colors carry a `light` and a `dark` mode. This
+  is the only tier a component may use.
+- `npm run build:tokens` writes `tokens/css/tokens.css`: every semantic token
+  as `--ws-<id>`, light values on `:root` and dark ones under
+  `[data-theme="dark"]`, with every primitive inlined and dropped. The prefix
+  is one constant in `tokens/scripts/source.mjs`.
+- `tokens/scripts/build-manifest.mjs` exports the same tokens with resolved
+  values, for the token pages.
+
+Token files are plain JSON with one-line diffs, so any DTCG editor works on
+them as-is.
+
+## Components
+
+Three examples under `components/`, each a directory of the same seven files:
+`name.tsx`, `name.module.css`, `name.stories.tsx`, `name.test.tsx`,
+`name.figma.tsx` (Code Connect, a placeholder file key until one exists),
+`name.contract.json` and `index.ts`.
+
+| Component | What it shows                                                                                    |
+| --------- | ------------------------------------------------------------------------------------------------ |
+| `badge`   | The minimal component, the one to copy.                                                          |
+| `button`  | Enum props with defaults, an icon slot, and a design-only `state` axis the code must not carry.  |
+| `card`    | Composition: `Card` and `Card.Header` are two contracts in one directory, each against its file. |
+
+A **contract** (`*.contract.json`) is the source of truth for a component: its
+props, its element structure and the tokens its styles bind. `npm run
+drift:verify` runs [design-delta](https://github.com/chrisgriffin/design-delta)
+over `design-delta.json` and fails when the code or a stylesheet disagrees with
+a contract, or when a component has no contract: `design-delta.json` raises
+`coverage/uncontracted-component` to `error`, and
+`test-utils/contract-coverage.test.ts` holds it there. Styles use only
+`--ws-*` custom properties; Stylelint refuses a literal where a token belongs.
+
+## Storybook
+
+`npm run storybook` serves the component stories plus two system pages, and
+`npm run build-storybook` writes `storybook-static/`, published to
+[GitHub Pages](https://chrisgriffin.github.io/weather-star/storybook/), one
+level under the app, on every push to `main`.
+
+- **Tokens** renders every semantic token from the build manifest, the colors
+  in both themes side by side, and the primitive palette.
+- **Design Drift** renders `design-delta audit --json`, run when Storybook
+  starts: the same verdict `npm run verify` gates on.
+
+The toolbar's theme toggle sets `data-theme` on the preview's root, which is
+what the token CSS keys off. Docs come from `@storybook/addon-docs`.
+`@storybook/addon-a11y` shows an accessibility panel beside each story; it
+reports to whoever is looking and fails nothing. What fails is the gate: every
+component's test runs axe-core over its variants in jsdom, so a violation turns
+`npm run verify` red. Colour contrast needs a real browser, so only the panel
+checks it.
+
+## Development
+
+```bash
+npm install
+npm run dev      # the app, served by Vite
+npm run build    # the app → dist/
+npm run verify   # build:tokens → typecheck → prettier:check → lint → lint:styles → drift:verify → test → build
+npm run build-storybook   # the Storybook; this checkout's is built by storybook / ci on a PR, deploy-pages.yml on main
+```
+
+How the repo fits together, in prose: [docs/architecture.md](docs/architecture.md);
+how a change becomes a release: [docs/releasing.md](docs/releasing.md).
+
+The design-delta engine comes from the public npm registry on a caret range
+(`^0.27.0`), so installing the engine needs no git access or credentials and `npm ci`
+gets exactly the engine the lockfile records. Move to a new minor on purpose:
+`npm install design-delta@^<version>`, then `npm run verify`, and read any
+change in its findings before committing
+([ADR-003](docs/adr/ADR-003-engine-from-the-registry.md)).
+
+Prettier, ESLint and TypeScript come from the shared
+[`@chrisgriffin/config`](https://github.com/chrisgriffin/config); Stylelint
+holds every `.css` file to the token tier (a color, size or font that is not a
+`--ws-*` custom property fails).
+
+## Agent layer
+
+`.claude/settings.json` wires three hooks: `bash-guard.sh` before every Bash
+call (no force push, no push to `main`), `post-edit-check.sh` after every
+edit (Prettier, and Stylelint on CSS), and `design-delta-verify.mjs`, which
+`design-delta dock` generates and which runs the gate after every edit so an
+agent sees drift before it finishes. `.claude/skills/design-delta/` is the
+dock's stub, pointing at the installed engine's own skill.
+`npm run scaffold -- <name>` writes a new component directory in the shape of
+`components/badge` plus the contract the engine drafts from its props.
+`CLAUDE.md` is the rulebook an agent reads first.
+
+## License
+
+MIT.

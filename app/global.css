@@ -1,0 +1,7 @@
+/* The page itself; everything else is a component's or a screen's module. */
+body {
+  margin: 0;
+  background: var(--ws-color-bg-canvas);
+  color: var(--ws-color-fg-default);
+  font-family: var(--ws-font-family-body);
+}

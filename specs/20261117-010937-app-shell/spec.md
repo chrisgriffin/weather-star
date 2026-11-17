@@ -1,5 +1,7 @@
 # Spec: Add the app shell and publish it beside the Storybook
 
+**Issue**: [#3](https://github.com/chrisgriffin/weather-star/issues/3)
+
 ## Overview
 
 weather-star has a design system and no app. This adds the app's shell: a page that Vite serves and builds, a placeholder screen made from the existing tokens and components, and a deploy that publishes the app at the site's root with the Storybook one level down. It also rewrites the passages that still describe the repo as a design system template, since it is now an app with its own design system.
@@ -24,11 +26,11 @@ The screens, the weather data and the retro theme are not part of this; each is 
 
 ## Success criteria
 
-- [ ] **Runnable:** `npm run build:tokens && npm run build && grep -c "<div id=\"root\">" dist/index.html` prints `1` (there is no `build` script today, so it fails).
-- [ ] `npm run verify` exits 0 and includes the app's build, its type check and its test.
-- [ ] The app's test renders the placeholder screen, finds its heading and reports no axe violation.
-- [ ] `deploy-pages.yml` uploads one folder holding the app's `index.html` at its root and the Storybook's `index.html` under `storybook/`.
-- [ ] `CLAUDE.md`, `docs/architecture.md` and the `package.json` description no longer call the repo a template, and `docs/architecture.md` describes `app/`.
+- [x] **Runnable:** `npm run build:tokens && npm run build && grep -c "<div id=\"root\">" dist/index.html` prints `1` (there is no `build` script today, so it fails).
+- [x] `npm run verify` exits 0 and includes the app's build, its type check and its test.
+- [x] The app's test renders the placeholder screen, finds its heading and reports no axe violation.
+- [x] `deploy-pages.yml` uploads one folder holding the app's `index.html` at its root and the Storybook's `index.html` under `storybook/`.
+- [x] `CLAUDE.md`, `docs/architecture.md` and the `package.json` description no longer call the repo a template, and `docs/architecture.md` describes `app/`.
 
 ## Out of scope
 

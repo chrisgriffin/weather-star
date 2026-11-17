@@ -1,0 +1,19 @@
+.screen {
+  display: grid;
+  gap: var(--ws-stack-lg);
+  place-content: center;
+  min-height: 100vh;
+  padding: var(--ws-inset-xl);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--ws-font-family-heading);
+  font-size: var(--ws-font-size-4xl);
+  font-weight: var(--ws-font-weight-bold);
+  line-height: var(--ws-line-height-tight);
+}
+
+.note {
+  margin: var(--ws-stack-sm) 0 0;
+}

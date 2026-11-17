@@ -7,11 +7,15 @@ same PR.
 
 ## What it is
 
-weather-star is a template for a design system that a coding agent can work in without drifting from it. A copy of this repo is a design system's starting point: a token source, a handful of example components with contracts, a Storybook, and the hooks and rulebook that let an agent build the next component and get told, before it finishes, when its code, its stylesheet and its contract disagree.
+weather-star is a browser weather app in the style of 1990s local cable forecasts, built on its own design system. The app is a shell today: one placeholder screen, with the forecast screens, the weather data and the retro theme still to come. The design system under it is a token source, a handful of example components with contracts, a Storybook, and the hooks and rulebook that let an agent build the next component and get told, before it finishes, when its code, its stylesheet and its contract disagree.
 
-It exists because a design system maintained by agents fails in one particular way: the code quietly stops matching the design. The template's answer is the one the [design-delta](https://github.com/chrisgriffin/design-delta) engine takes: a per-component **contract** is the fixed point, and every check compares one side against it.
+The design system is shaped the way it is because a design system maintained by agents fails in one particular way: the code quietly stops matching the design. Its answer is the one the [design-delta](https://github.com/chrisgriffin/design-delta) engine takes: a per-component **contract** is the fixed point, and every check compares one side against it.
 
 ## How it works
+
+### The app
+
+`index.html` at the repo root is the page Vite serves and builds, and `app/` is the app it loads: `main.tsx` mounts React and imports the built token CSS and `global.css` (the page's own background, color and font), and `app.tsx` with `app.module.css` is the placeholder screen, made from `Card`, `Badge` and `--ws-*` tokens like anything else here. `npm run dev` serves it and `npm run build` writes it to `dist/`, with a relative base (`base: "./"` in `vite.config.ts`) so the built page finds its files at any address. `app/` is not under `components/`, so the engine asks it for no contract; Stylelint holds its stylesheets to the tokens all the same, and `app/app.test.tsx` is its test.
 
 ### Tokens
 
@@ -27,7 +31,7 @@ The contract declares the props, the element structure and the tokens the styles
 
 ### Storybook
 
-`.storybook/` runs Storybook on Vite with docs, an accessibility panel (`@storybook/addon-a11y`, which shows findings and fails nothing; the gate's accessibility check is each component's axe test) and a theme toggle that sets `data-theme` on the root. `main.ts` inlines the token manifest and `design-delta audit --json` at start, so the two system pages under `.storybook/pages/` (Tokens, Design Drift) render what the build and the gate already compute. `npm run build-storybook` writes `storybook-static/`, which `deploy-pages.yml` publishes to GitHub Pages on every push to `main`.
+`.storybook/` runs Storybook on Vite with docs, an accessibility panel (`@storybook/addon-a11y`, which shows findings and fails nothing; the gate's accessibility check is each component's axe test) and a theme toggle that sets `data-theme` on the root. `main.ts` inlines the token manifest and `design-delta audit --json` at start, so the two system pages under `.storybook/pages/` (Tokens, Design Drift) render what the build and the gate already compute. `npm run build-storybook` writes `storybook-static/`. On every push to `main`, `deploy-pages.yml` builds the app into `dist/` and the Storybook into `dist/storybook/` and publishes that folder to GitHub Pages: the app at the site root, the Storybook under `storybook/`.
 
 ### The agent layer
 
@@ -38,6 +42,7 @@ The contract declares the props, the element structure and the tokens the styles
 - `docs/` — this file and the rest of the written record; `docs/adr/` holds the decision records.
 - `specs/` — the Spec Kit spec, plan and tasks behind each build.
 - `test-utils/` — helpers the component tests import: `axe.ts` holds `expectNoViolations`, the accessibility assertion every component's test calls, and `a11y-coverage.test.ts` fails the gate on a component test that never calls it, and on a component folder with no test file; `contract-coverage.test.ts` fails it unless a component with no contract fails `drift:verify`.
+- `dist/` — the built app, not tracked.
 - `types/` — ambient declarations TypeScript cannot infer: `css-modules.d.ts` types a `*.module.css` import and a plain stylesheet's side-effect import, both of which Vite resolves at build time. It is the one declaration of either.
 - `.github/workflows/` — CI, the Storybook check, the Pages deploy, and the release and review-loop triggers.
 - `.design-delta/` — the engine's output, not tracked today: its reports and state are ignored, and a gathered snapshot of the design side will be committed under `snapshots/` once `design-delta.json` names a design file (`design.files` is empty, so none exists yet).
@@ -48,12 +53,14 @@ The contract declares the props, the element structure and the tokens the styles
 - **Terrazzo** builds the tokens; **Vite**, **Vitest**, **Testing Library** and **Storybook** build and test the components; **Code Connect** maps each component to its Figma node once a file key is set.
 - **The shared configs** `@chrisgriffin/config` supply Prettier, ESLint and the TypeScript base.
 - **CI.** Every workflow in `.github/workflows/` but the Pages deploy is a thin trigger stub calling one of the `_reusable-*.yml` workflows in the public [chrisgriffin/workflows](https://github.com/chrisgriffin/workflows) repo at its `v1` tag, passing this repo's own facts as inputs. The Pages deploy is GitHub's standard upload-then-deploy workflow.
-- **Nothing depends on this repo as code.** It is a template: a copy of it, renamed, is a new design system.
+- **Nothing depends on this repo as code.** It is a one-off app; its design system was made by a design system template's `create` command and is not published as a package.
 
 ## Running it
 
 ```bash
 npm install
+npm run dev               # the app, served by Vite
+npm run build             # the app → dist/
 npm run build:tokens      # tokens/json → tokens/css/tokens.css
 npm run storybook         # the stories and the two system pages
 npm run drift:verify      # every contract against its code and styles
@@ -61,11 +68,11 @@ npm run scaffold -- name  # a new component directory plus a draft contract
 npm run verify            # the gate CI runs as build / ci; Storybook builds in storybook / ci
 ```
 
-The gate CI runs, and the one to run before pushing, is `npm run verify`: `build:tokens`, `typecheck`, `prettier:check`, `lint`, `lint:styles`, `drift:verify` and `test`, in that order. `storybook / ci` is the only check that builds this checkout's Storybook (`npm run build:tokens && npm run build-storybook`), and `deploy-pages.yml` builds it again on a push to `main`.
+The gate CI runs, and the one to run before pushing, is `npm run verify`: `build:tokens`, `typecheck`, `prettier:check`, `lint`, `lint:styles`, `drift:verify`, `test` and `build`, in that order. `storybook / ci` is the only check that builds this checkout's Storybook (`npm run build:tokens && npm run build-storybook`), and `deploy-pages.yml` builds it again, with the app, on a push to `main`.
 
 ## Where to look next
 
-- [README.md](../README.md) — what the template is and how to start from it.
+- [README.md](../README.md) — what the app is and how to run it.
 - [testing.md](./testing.md) — what each test covers and where a new one belongs.
 - [releasing.md](./releasing.md) — how a change becomes a tagged release.
 - [adr/README.md](./adr/README.md) — the decision records.

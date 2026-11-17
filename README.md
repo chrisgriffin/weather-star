@@ -2,8 +2,12 @@
 
 A browser weather app in the style of 1990s local cable forecasts. A one-off,
 built for fun on its own design system, which a design system template's
-`create` command made in one run. The app's screens are not built yet; what
-follows describes the design system they will be built from.
+`create` command made in one run. The app is a shell today: `npm run dev`
+serves one placeholder screen from `app/`, and the forecast screens are not
+built yet. It is published at
+[chrisgriffin.github.io/weather-star](https://chrisgriffin.github.io/weather-star/)
+on every push to `main`. What follows describes the design system the
+screens will be built from.
 
 A design system an agent can build in and keep honest: design tokens
 in the [DTCG](https://www.designtokens.org/tr/2025.10/format/) format, built
@@ -61,8 +65,8 @@ a contract, or when a component has no contract: `design-delta.json` raises
 
 `npm run storybook` serves the component stories plus two system pages, and
 `npm run build-storybook` writes `storybook-static/`, published to
-[GitHub Pages](https://chrisgriffin.github.io/weather-star/) on every
-push to `main`.
+[GitHub Pages](https://chrisgriffin.github.io/weather-star/storybook/), one
+level under the app, on every push to `main`.
 
 - **Tokens** renders every semantic token from the build manifest, the colors
   in both themes side by side, and the primitive palette.
@@ -81,7 +85,9 @@ checks it.
 
 ```bash
 npm install
-npm run verify   # build:tokens → typecheck → prettier:check → lint → lint:styles → drift:verify → test
+npm run dev      # the app, served by Vite
+npm run build    # the app → dist/
+npm run verify   # build:tokens → typecheck → prettier:check → lint → lint:styles → drift:verify → test → build
 npm run build-storybook   # the Storybook; this checkout's is built by storybook / ci on a PR, deploy-pages.yml on main
 ```
 

@@ -2,7 +2,7 @@
   "name": "weather-star",
   "version": "0.0.0",
   "private": true,
-  "description": "A design system template an agent can build in and keep honest: DTCG tokens, component contracts, Storybook, and the design-delta gate.",
+  "description": "A browser weather app in the style of 1990s local cable forecasts, built on its own design system: DTCG tokens, component contracts, Storybook, and the design-delta gate.",
   "license": "MIT",
   "type": "module",
   "repository": {
@@ -13,6 +13,8 @@
     "node": ">=22"
   },
   "scripts": {
+    "dev": "vite",
+    "build": "vite build",
     "build:tokens": "node tokens/scripts/build-css.mjs",
     "prettier:check": "prettier --check .",
     "prettier:format": "prettier --write .",
@@ -21,7 +23,7 @@
     "typecheck": "tsc --noEmit",
     "scaffold": "node scripts/scaffold-component.mjs",
     "test": "node --test tokens/scripts/*.test.mjs && vitest run",
-    "verify": "npm run build:tokens && npm run typecheck && npm run prettier:check && npm run lint && npm run lint:styles && npm run drift:verify && npm test",
+    "verify": "npm run build:tokens && npm run typecheck && npm run prettier:check && npm run lint && npm run lint:styles && npm run drift:verify && npm test && npm run build",
     "drift:audit": "design-delta audit",
     "drift:contracts": "design-delta contracts",
     "drift:lint": "design-delta lint",

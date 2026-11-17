@@ -5,7 +5,7 @@ export default [
   { ignores: ["tokens/css/", "storybook-static/", "dist/", "coverage/"] },
   ...base,
   {
-    files: ["components/**", ".storybook/**"],
+    files: ["app/**", "components/**", ".storybook/**"],
     languageOptions: {
       globals: {
         ...globals.browser,

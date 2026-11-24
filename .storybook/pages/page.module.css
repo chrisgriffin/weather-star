@@ -1,0 +1,82 @@
+/* The system pages' own layout. Values are tokens, like any component. */
+.page {
+  padding: var(--ws-inset-xl);
+  color: var(--ws-color-fg-default);
+  font-family: var(--ws-font-family-body);
+  font-size: var(--ws-font-size-sm);
+  line-height: var(--ws-line-height-body);
+}
+
+.title {
+  margin: 0 0 var(--ws-stack-sm);
+  font-family: var(--ws-font-family-heading);
+  font-size: var(--ws-font-size-3xl);
+  font-weight: var(--ws-font-weight-bold);
+  line-height: var(--ws-line-height-tight);
+}
+
+.heading {
+  margin: var(--ws-stack-xl) 0 var(--ws-stack-sm);
+  font-family: var(--ws-font-family-heading);
+  font-size: var(--ws-font-size-xl);
+  font-weight: var(--ws-font-weight-semibold);
+  line-height: var(--ws-line-height-snug);
+}
+
+.note {
+  margin: 0 0 var(--ws-stack-md);
+  color: var(--ws-color-fg-muted);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+
+  & th,
+  & td {
+    padding: var(--ws-inset-xs) var(--ws-inset-sm);
+    border-block-end: var(--ws-border-default) solid
+      var(--ws-color-border-default);
+    text-align: start;
+    vertical-align: top;
+  }
+
+  & th {
+    color: var(--ws-color-fg-muted);
+    font-weight: var(--ws-font-weight-medium);
+  }
+}
+
+.code {
+  font-family: var(--ws-font-family-code);
+  font-size: var(--ws-font-size-xs);
+}
+
+.swatch {
+  display: inline-block;
+  inline-size: var(--ws-inline-lg);
+  block-size: var(--ws-inline-lg);
+  border: var(--ws-border-default) solid var(--ws-color-border-default);
+  border-radius: var(--ws-radius-sm);
+  vertical-align: middle;
+}
+
+.light {
+  color-scheme: light;
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+.error {
+  color: var(--ws-color-danger-default);
+}
+
+.warn {
+  color: var(--ws-color-accent-default);
+}
+
+.review {
+  color: var(--ws-color-fg-muted);
+}

@@ -1,1 +1,7 @@
+# Chris is the merge gate on this repo. Listing him here makes GitHub request
+# his review on every pull request automatically (and never re-request once he
+# has reviewed). GitHub reads this file from the branch a pull request merges
+# into, so it has to be on `develop` and `main`, not only on the branch that
+# opens the pull request. `test-utils/codeowners.test.ts` fails the gate if a
+# rule here stops naming him.
 * @chrisgriffin

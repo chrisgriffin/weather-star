@@ -1,8 +1,8 @@
 name: Create GitHub Release
 
 # Thin stub: merging release/next into main tags vX.Y.Z and creates the
-# GitHub Release from that version's CHANGELOG.md entry. The template is a
-# private package, so nothing is built, attached or published.
+# GitHub Release from that version's CHANGELOG.md entry. The package is
+# private, so nothing is built, attached or published.
 
 on:
   pull_request:

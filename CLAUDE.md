@@ -1,16 +1,18 @@
 # weather-star — context for Claude
 
-A template for a design system a coding agent can work in without drifting from its tokens and contracts. How it works, for a person: [README.md](README.md).
+A browser weather app in the style of 1990s local cable forecasts, built on its own design system, which a coding agent can work in without drifting from its tokens and contracts. The app is `app/`; the design system is everything else. How it works, for a person: [README.md](README.md).
 
 ## Commands
 
 ```bash
+npm run dev               # the app, served by Vite
+npm run build             # the app → dist/
 npm run build:tokens      # tokens/json → tokens/css/tokens.css (semantic --ws-* only)
 npm run drift:verify      # design-delta: every contract against its code and styles
 npm run scaffold -- name  # a new component directory plus a draft contract
 npm run storybook         # the stories, the Tokens page, the Design Drift page
-npm run typecheck         # tsc --noEmit: components, .storybook, types, vitest.setup.ts
-npm run verify            # the gate CI runs as build / ci, typecheck included; Storybook builds in storybook / ci
+npm run typecheck         # tsc --noEmit: app, components, .storybook, types, vitest.setup.ts
+npm run verify            # the gate CI runs as build / ci, typecheck and the app's build included; Storybook builds in storybook / ci
 ```
 
 ## Non-negotiable invariants
@@ -31,7 +33,7 @@ Code Connect: `<name>.figma.tsx` carries a placeholder file key until the Figma 
 | If you touch                                              | Then                                                                                                                   |
 | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | `PREFIX` in `tokens/scripts/source.mjs`                   | `conventions.cssVarPrefix` in `design-delta.json`, and every `--ws-*` reference in `components/**` and `.storybook/**` |
-| a font family in `tokens/json/primitives/typography.json` | the font links in `.storybook/preview-head.html`                                                                       |
+| a font family in `tokens/json/primitives/typography.json` | the font links in `.storybook/preview-head.html` and `index.html`                                                      |
 | a semantic token's `$extensions.mode`                     | `modeSelectors` in `terrazzo.config.mjs`, and the theme test in `tokens/scripts/tokens.test.mjs`                       |
 | a prop or an element in `<name>.tsx`                      | `<name>.contract.json` (props, anatomy) and `<name>.figma.tsx`; `npm run drift:verify` reports the first two           |
 | a job name in `.github/workflows/*.yml`                   | the branch ruleset on GitHub, which requires each check by name (admin-only)                                           |
@@ -46,5 +48,5 @@ Code Connect: `<name>.figma.tsx` carries a placeholder file key until the Figma 
 ## CI
 
 Every workflow in `.github/workflows/` is a thin stub calling a reusable workflow in the public [chrisgriffin/workflows](https://github.com/chrisgriffin/workflows) repo at its `v1` tag, except the Pages deploy, which is GitHub's standard one.
-The gate is `npm run verify`; `storybook / ci` is the only check that builds this checkout's Storybook, and `deploy-pages.yml` builds it again on a push to `main` to deploy it.
+The gate is `npm run verify`; `storybook / ci` is the only check that builds this checkout's Storybook, and `deploy-pages.yml` builds the app and the Storybook again on a push to `main` to deploy them: the app at the site root, the Storybook under `storybook/`.
 Accessibility: every component test calls `expectNoViolations` (`test-utils/axe.ts`, axe-core in jsdom), so a violation fails the gate; fix the component, never the rule. The Storybook a11y addon only shows a panel and fails nothing; it is the only contrast check, since jsdom cannot measure contrast.

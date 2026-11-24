@@ -8,6 +8,7 @@ CHANGELOG.md
 # Build output.
 tokens/css/
 storybook-static/
+dist/
 
 # Laid over a checkout at runtime by the build loop that runs this repo.
 .agents/

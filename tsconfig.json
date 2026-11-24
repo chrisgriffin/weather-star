@@ -9,6 +9,7 @@
     "allowImportingTsExtensions": true
   },
   "include": [
+    "app",
     "components",
     "tokens/scripts",
     ".storybook/**/*",

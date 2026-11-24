@@ -1,6 +1,6 @@
 # Releasing
 
-A release of weather-star is a `vX.Y.Z` tag with a GitHub Release, whose notes are that version's `CHANGELOG.md` entry. The template is a private package: a release attaches no file and publishes to no registry.
+A release of weather-star is a `vX.Y.Z` tag with a GitHub Release, whose notes are that version's `CHANGELOG.md` entry. The package is private: a release attaches no file and publishes to no registry.
 
 ## How a release happens
 
@@ -19,7 +19,7 @@ A release of weather-star is a `vX.Y.Z` tag with a GitHub Release, whose notes a
 
 All three files are thin stubs calling the shared release workflows in the
 public `chrisgriffin/workflows` repo. The same push to `main` also runs
-`deploy-pages.yml`, so the published Storybook follows the release.
+`deploy-pages.yml`, so the published app and Storybook follow the release.
 
 ## Versioning
 
@@ -42,7 +42,7 @@ through `release-pr.yml`. Merging it runs steps 4 and 5 above.
 ## What this repo ships
 
 - A tag and a GitHub Release, nothing more: `create-github-release.yml` passes no build command, no assets and no registry.
-- The Storybook at the repo's GitHub Pages URL, rebuilt by `deploy-pages.yml` from the same push to `main`.
+- The app at the repo's GitHub Pages URL and the Storybook under `storybook/` there, both rebuilt by `deploy-pages.yml` from the same push to `main`.
 
 ## Manual steps
 

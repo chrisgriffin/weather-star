@@ -1,6 +1,6 @@
 # Testing
 
-The tests prove that the token build emits what the components may use and nothing else, that each component renders what its contract says, and that the engine's gate agrees with both.
+The tests prove that the token build emits what the components may use and nothing else, that each component renders what its contract says, that the engine's gate agrees with both, and that the app renders and builds.
 
 ## The gate
 
@@ -13,15 +13,16 @@ The tests prove that the token build emits what the components may use and nothi
 
 ## Running tests
 
-`build-check.yml` runs `npm run verify`, which is these seven in order:
+`build-check.yml` runs `npm run verify`, which is these eight in order:
 
 - `npm run build:tokens` — Terrazzo over `tokens/json`, then the primitive inlining; the later steps read its output.
-- `npm run typecheck` — `tsc --noEmit` over the program `tsconfig.json` includes: `components`, `.storybook` (named by its `.storybook/**/*` glob, since `tsc` skips a dot-directory a bare name reaches), `types`, `vitest.setup.ts`, and from `tokens/scripts` only `build-manifest.d.mts`, its `.mjs` scripts being plain ESM outside the program; a type error fails it, naming the file and the line.
+- `npm run typecheck` — `tsc --noEmit` over the program `tsconfig.json` includes: `app`, `components`, `.storybook` (named by its `.storybook/**/*` glob, since `tsc` skips a dot-directory a bare name reaches), `types`, `vitest.setup.ts`, and from `tokens/scripts` only `build-manifest.d.mts`, its `.mjs` scripts being plain ESM outside the program; a type error fails it, naming the file and the line.
 - `npm run prettier:check` — Prettier over everything `.prettierignore` does not exclude, in the shared `@chrisgriffin/config/prettier` style.
 - `npm run lint` — ESLint from `eslint.config.mjs`, which spreads `@chrisgriffin/config/eslint` first.
 - `npm run lint:styles` — Stylelint over every `.css` file: a color, fill or stroke, font family, size or weight, line height, border radius, margin or padding, gap, or transition or animation duration or timing value that is not a `--ws-*` property fails (other sizes, such as `width`, are not checked), and so does a property name the built CSS does not define.
 - `npm run drift:verify` — `design-delta verify`: every contract validated, then compared with its component and stylesheet; an error-severity finding fails it, and a component no contract references is one (`coverage/uncontracted-component`, raised to `error` in `design-delta.json`).
-- `npm test` — `node --test` over `tokens/scripts/*.test.mjs`, then `vitest run` over `components/**/*.test.tsx` and `test-utils/**/*.test.ts` in jsdom (`test-utils/contract-coverage.test.ts` in Node, since it runs the engine).
+- `npm test` — `node --test` over `tokens/scripts/*.test.mjs`, then `vitest run` over `app/**/*.test.tsx`, `components/**/*.test.tsx` and `test-utils/**/*.test.ts` in jsdom (`test-utils/contract-coverage.test.ts` in Node, since it runs the engine).
+- `npm run build` — `vite build` of the app into `dist/`; a module that does not resolve or bundle fails it.
 
 `storybook-check.yml` is the Storybook gate, `storybook / ci`, and the only check that builds this checkout's Storybook: `npm run build:tokens && npm run build-storybook`, the Storybook build also running the engine's audit for the Design Drift page. Run it with `verify` before pushing a change to a component, a story or `.storybook/`.
 
@@ -32,6 +33,7 @@ Narrower runs while working: `npx vitest run components/badge` for one component
 - `tokens/scripts/tokens.test.mjs` — the built CSS declares no `--ws-primitive-*` property, has no `var()` left and declares more than 40 `--ws-*` properties, both themes are present and differ, and every manifest value is a literal.
 - `tokens/scripts/inline-primitives.test.mjs` — `inlinePrimitives` on its own, without running the build: a primitive reference becomes the primitive's value, primitive declarations are gone from the output, an undeclared primitive throws, a primitive aliasing another inlines to its final value, a reference cycle throws naming it (a self-reference and a cycle nothing references too), a reference with whitespace or a fallback is inlined, a semantic name containing `-primitive-` is left alone, a primitive declared in two blocks throws, and a primitive left in the output in any other form throws.
 
+- `app/app.test.tsx` — the placeholder screen renders the app's name in a top-level heading inside `main`, and `expectNoViolations` finds no violation in it.
 - `components/<name>/<name>.test.tsx` — each component renders its content and the class its stylesheet keys off, with Testing Library; CSS Module class names are unscoped in tests so an assertion can name them.
 - The same files' accessibility tests — `expectNoViolations` from `test-utils/axe.ts` runs axe-core over the rendered DOM and fails on any violation, naming the rule, how many elements broke it and the first one. It covers each component's default and every variant its contract gives code: `badge`'s four tones, `button`'s three sizes by two variants plus the `iconBefore` slot, and `card`'s two paddings, each with a `Card.Header`, which is also `card-header`'s coverage. `color-contrast` is switched off: jsdom has no layout and no computed colour, so axe cannot measure it, and rules that need layout report incomplete rather than failing. Contrast is checked only by the Storybook accessibility panel (`@storybook/addon-a11y`), which shows findings in the browser and fails nothing.
 - `test-utils/a11y-coverage.test.ts` — the gate enforces the rule that every component test calls `expectNoViolations`: it reads each `components/**/*.test.tsx` and fails, naming the file, when one never calls it (comments do not count, and importing it is not calling it). It also fails, naming the folder, when a folder under `components/` holds a component source file but no `.test.tsx`; the check is per folder, so `card-header.tsx` is covered by `card.test.tsx`.
@@ -41,7 +43,8 @@ Narrower runs while working: `npx vitest run components/badge` for one component
 
 ## Adding a test
 
-- A component's test is `components/<name>/<name>.test.tsx`; `vite.config.ts` collects `components/**/*.test.tsx` and `test-utils/**/*.test.ts` only.
+- A component's test is `components/<name>/<name>.test.tsx`; `vite.config.ts` collects `app/**/*.test.tsx`, `components/**/*.test.tsx` and `test-utils/**/*.test.ts` only.
+- A screen's test is a `.test.tsx` beside it under `app/`, and calls `expectNoViolations` too; `test-utils/a11y-coverage.test.ts` reads `components/` only, so nothing fails an `app/` test that forgets.
 - A component's test also calls `expectNoViolations` from `../../test-utils/axe` on each variant its contract gives code; `npm run scaffold` writes the first call for you, and `test-utils/a11y-coverage.test.ts` fails `npm test` on a test file without one, and on a component folder with no test file at all. A violation is fixed in the component, never by switching a rule off.
 - A token test is a `.test.mjs` beside the scripts under `tokens/scripts/`, on `node:test`.
 - `vitest.setup.ts` loads jest-dom's matchers and cleans the DOM after each test. It is in the TypeScript program, so `typecheck` sees those matchers on every test file.
